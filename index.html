@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RewardDrop | Get Your Gift</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            /* خلفية احترافية مدمجة مع طبقة سوداء شفافة لضمان وضوح النصوص */
+            background: linear-gradient(rgba(10, 10, 15, 0.85), rgba(10, 10, 15, 0.95)), 
+                        url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        header {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        header p {
+            color: #b0b0c0;
+            font-size: 1.1rem;
+        }
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 50px;
+        }
+        .offer-card {
+            background: rgba(26, 26, 36, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #2a2a35;
+            position: relative;
+            overflow: hidden;
+        }
+        .offer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 242, 254, 0.25);
+            border-color: #00f2fe;
+        }
+        .offer-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #2a2a35;
+        }
+        .offer-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .offer-desc {
+            font-size: 0.9rem;
+            color: #9e9ea0;
+            margin-bottom: 20px;
+            min-height: 45px;
+        }
+        .claim-btn {
+            display: block;
+            text-decoration: none;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+            font-weight: 800;
+            padding: 14px;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            width: 100%;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        .claim-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .btn-shein { background: linear-gradient(45deg, #111, #333); }
+        .btn-robux { background: linear-gradient(45deg, #00a8ff, #0097e6); }
+        .btn-gta { background: linear-gradient(45deg, #ff9f43, #ff6b6b); }
+        .btn-cash { background: linear-gradient(45deg, #20bf6b, #0fb9b1); }
+        
+        .pulse-badge {
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background: #ff4757;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+            z-index: 2;
+        }
+
+        /* ------------------------------------------- */
+        /* 1. شاشة التحميل الوهمية (Fake Processing)   */
+        /* ------------------------------------------- */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9998;
+            display: none; /* مخفي افتراضياً */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(0, 242, 254, 0.2);
+            border-top-color: #00f2fe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .loading-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #00f2fe;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            transition: color 0.3s ease;
+        }
+
+        /* ------------------------------------------- */
+        /* 2. نظام اللوكر المدمج (The Unclosable Trap) */
+        /* ------------------------------------------- */
+        #locker-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 9999;
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .locker-box {
+            width: 95%;
+            max-width: 600px;
+            height: 85vh;
+            background: #1a1a24;
+            border-radius: 15px;
+            border: 2px solid #ff4757; /* أحمر ليدل على الأهمية */
+            box-shadow: 0 0 40px rgba(255, 71, 87, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .locker-header {
+            background: #0f0f13;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #2a2a35;
+        }
+        .locker-header h2 {
+            color: #ff4757;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        .locker-header p {
+            color: #a0a0b0;
+            font-size: 0.85rem;
+        }
+        .locker-box iframe {
+            width: 100%;
+            flex-grow: 1;
+            border: none;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>RewardDrop</h1>
+        <p>Select your exclusive reward and verify to unlock.</p>
+    </header>
+
+    <div class="offers-grid">
+        <!-- العرض 1 -->
+        <div class="offer-card">
+            <div class="pulse-badge">Hot</div>
+            <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Shein" class="offer-img">
+            <h2 class="offer-title">$750 Shein Gift Card</h2>
+            <p class="offer-desc">Get a free $750 Shein shopping spree. Limited time offer!</p>
+            <button class="claim-btn btn-shein open-locker">Claim Now</button>
+        </div>
+
+        <!-- العرض 2 -->
+        <div class="offer-card">
+            <div class="pulse-badge">Viral</div>
+            <img src="https://images.unsplash.com/photo-1605901309584-818e25960b8f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Roblox" class="offer-img">
+            <h2 class="offer-title">25,000 Free Robux</h2>
+            <p class="offer-desc">Instantly add 25k Robux to your account. No password needed.</p>
+            <button class="claim-btn btn-robux open-locker">Claim Now</button>
+        </div>
+
+        <!-- العرض 3 -->
+        <div class="offer-card">
+            <img src="https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="GTA" class="offer-img">
+            <h2 class="offer-title">GTA 6 Beta Access</h2>
+            <p class="offer-desc">Get an exclusive invite code for the GTA 6 closed beta.</p>
+            <button class="claim-btn btn-gta open-locker">Claim Now</button>
+        </div>
+
+        <!-- العرض 4 -->
+        <div class="offer-card">
+            <img src="https://images.unsplash.com/photo-1580519542014-2703443818bc?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="CashApp" class="offer-img">
+            <h2 class="offer-title">$500 CashApp Transfer</h2>
+            <p class="offer-desc">Receive a direct $500 transfer to your CashApp account.</p>
+            <button class="claim-btn btn-cash open-locker">Claim Now</button>
+        </div>
+    </div>
+
+    <!-- 1. شاشة التحميل الوهمية -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loading-msg">Connecting to secure server...</div>
+    </div>
+
+    <!-- 2. إطار عرض الـ CPA (اللوكر) -->
+    <div id="locker-overlay">
+        <div class="locker-box">
+            <div class="locker-header">
+                <h2>⚠️ Human Verification Required</h2>
+                <p>Unusual activity detected. Complete 1 task below to unlock your reward.</p>
+            </div>
+            <!-- رابط הـ CPA الخاص بك -->
+            <iframe src="https://appcomplete.org/cl/i/42dpo4"></iframe>
+        </div>
+    </div>
+
+    <!-- السكريبت السحري للتحكم بالأنيميشن -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const lockerOverlay = document.getElementById('locker-overlay');
+            const loadingMsg = document.getElementById('loading-msg');
+            const openButtons = document.querySelectorAll('.open-locker');
+
+            openButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // منع تمرير الصفحة
+                    document.body.style.overflow = 'hidden';
+                    
+                    // 1. إظهار شاشة التحميل
+                    loadingOverlay.style.display = 'flex';
+                    loadingMsg.style.color = '#00f2fe';
+                    loadingMsg.innerText = "Connecting to secure server...";
+                    
+                    // 2. تتابع الرسائل الوهمية (علم النفس)
+                    setTimeout(() => {
+                        loadingMsg.innerText = "Allocating your reward code...";
+                    }, 1500);
+
+                    setTimeout(() => {
+                        loadingMsg.innerText = "Checking IP address...";
+                    }, 3000);
+
+                    setTimeout(() => {
+                        // تحذير باللون الأحمر!
+                        loadingMsg.style.color = '#ff4757';
+                        loadingMsg.style.textShadow = '0 0 10px rgba(255, 71, 87, 0.5)';
+                        loadingMsg.innerText = "Anti-Bot System Triggered!";
+                    }, 4200);
+
+                    // 3. إخفاء التحميل وإظهار اللوكر الفعلي
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                        lockerOverlay.style.display = 'flex';
+                    }, 5500);
+
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
